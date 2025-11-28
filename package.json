@@ -1,0 +1,49 @@
+{
+  "name": "opencode-leak-proof",
+  "version": "0.1.0",
+  "description": "An OpenCode plugin that prevents leakage of sensitive content by hiding certain files from the agent based on glob patterns",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "default": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "leak-proof",
+    "sensitive-content",
+    "security",
+    "privacy",
+    "exclude",
+    "bun"
+  ],
+  "author": "Pedro Javier Martos Velasco",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjmartos/opencode-leak-proof.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pjmartos/opencode-leak-proof/issues"
+  },
+  "homepage": "https://github.com/pjmartos/opencode-leak-proof#readme",
+  "dependencies": {
+    "picomatch": "4.0.3"
+  },
+  "peerDependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "bun test"
+  }
+}
