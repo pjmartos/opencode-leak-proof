@@ -30,13 +30,13 @@ This project adheres to a code of conduct. By participating, you are expected to
 ### Development Setup
 
 #### Windows
-```powershell
-irm bun.sh/install.ps1|iex
+```shell
+powershell -Command "irm bun.sh/install.ps1|iex ; $env:PATH = [Environment]::GetEnvironmentVariable('Path', 'Machine'),[Environment]::GetEnvironmentVariable('Path', 'User') -join ';'"
 ```
 
 #### Linux / MacOSX
 ```bash
-curl -fsSL https://bun.com/install | bash
+curl -fsSL https://bun.com/install | bash && bash
 ```
 
 ### Coding Standards

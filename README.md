@@ -6,19 +6,46 @@ An OpenCode plugin that prevents AI assistants from accessing sensitive files an
 
 This plugin hooks into OpenCode's tool execution lifecycle to filter out sensitive content before it reaches the AI provider. It honours `.aiexclude` files at various locations as well as project-root `.gitignore` files, allowing you to protect credentials, API keys, and other sensitive data.
 
+## Features
+
+- **Pre-execution filtering**: Blocks tool calls that attempt to access excluded files
+- **Post-execution filtering**: Filters output that matches exclusion patterns
+- **Glob pattern support**: Uses wildcards and directory patterns, leverages existing `.gitignore` files for minimal setup
+- **Minimal dependencies**: Lightweight plugin using only Node.js built-ins and `picomatch` as its unique dependency
+
+## Requirements
+
+- Bun >= 1.1.0
+
 ## Installation
 
 ### Using Bun
 
+#### Linux / MacOSX
+1. Install `bun` (optional if not yet installed)
 ```bash
-cd $HOME/.config/opencode && bun add github:pjmartos/opencode-leak-proof
+curl -fsSL https://bun.com/install | bash
+```
+2. Install plugin
+```bash
+bash -c "mkdir -p $HOME/.config/opencode && cd $_ && bun add github:pjmartos/opencode-leak-proof"
+```
+
+#### Windows
+1. Install `bun` (optional if not yet installed)
+```shell
+powershell -Command "irm bun.sh/install.ps1|iex ; $env:PATH = [Environment]::GetEnvironmentVariable('Path', 'Machine'),[Environment]::GetEnvironmentVariable('Path', 'User') -join ';'"
+```
+2. Install plugin
+```shell
+powershell -Command "cd -Path $HOME ; md -Force .config\opencode ; cd .config\opencode ; bun add github:pjmartos/opencode-leak-proof"
 ```
 
 ## Usage
 
-### 1. Install the plugin in your OpenCode configuration
+### 1. Declare the plugin in your OpenCode configuration
 
-Add the plugin to your OpenCode configuration file (`$HOME/.config/opencode/opencode.json`):
+Add the plugin to [your OpenCode configuration file](https://opencode.ai/docs/config/):
 
 ```json
 {
@@ -38,21 +65,10 @@ Glob patterns are converted to regular expressions and matched against normalize
 
 ### 3. Provide guidelines via `AGENTS.md`
 
-In order to increase the effectiveness of the plugin, it is recommended to add instructions similar to the following in an `AGENTS.md` file:
+In order to increase the effectiveness of the plugin, it is recommended to add instructions similar to the following in [an `AGENTS.md` file](https://opencode.ai/docs/rules/):
 ```Markdown
 For any file operation (list, read, concatenate, dump, search), you must first run your `Read` tool on each file. If the read call returns an error, you are not allowed to use that file, and in that case you must skip it entirely.
 ```
-
-## Features
-
-- **Pre-execution filtering**: Blocks tool calls that attempt to access excluded files
-- **Post-execution filtering**: Filters output that matches exclusion patterns
-- **Glob pattern support**: Use wildcards and directory patterns, leverages existing `.gitignore` files for minimal setup
-- **Minimal dependencies**: Lightweight plugin using only Node.js built-ins and `picomatch` as its unique dependency
-
-## Requirements
-
-- Bun >= 1.0.0 (or Node.js with ESM support)
 
 ## Contributing
 
