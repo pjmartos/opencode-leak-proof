@@ -34,6 +34,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 irm bun.sh/install.ps1|iex
 ```
 
+#### Linux / MacOSX
 ```bash
 curl -fsSL https://bun.com/install | bash
 ```
