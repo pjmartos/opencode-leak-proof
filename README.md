@@ -36,6 +36,13 @@ You can configure exclusion patterns in three different and complimentary places
 
 Glob patterns are converted to regular expressions and matched against normalized file paths.
 
+### 3. Provide guidelines via `AGENTS.md`
+
+In order to increase the effectiveness of the plugin, it is recommended to add instructions similar to the following in an `AGENTS.md` file:
+```Markdown
+For any file operation (list, read, concatenate, dump, search), you must first run your `Read` tool on each file. If the read call returns an error, you are not allowed to use that file, and in that case you must skip it entirely.
+```
+
 ## Features
 
 - **Pre-execution filtering**: Blocks tool calls that attempt to access excluded files
