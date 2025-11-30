@@ -61,7 +61,7 @@ function parseRegex(pattern, strict = true) {
 
 function asRegex(pattern, projectRoot) {
   const inverted = pattern.startsWith('!');
-  let effectivePattern = inverted ? pattern.substring(1).trim() : pattern;
+  let effectivePattern = inverted ? pattern.substring(1) : pattern;
 
   if (!effectivePattern) {
     return {};
@@ -72,7 +72,7 @@ function asRegex(pattern, projectRoot) {
   }
 
   if (effectivePattern.startsWith('/')) {
-    effectivePattern = effectivePattern.substring(0);
+    effectivePattern = effectivePattern.substring(1);
   }
 
   return [

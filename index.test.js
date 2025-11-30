@@ -115,6 +115,39 @@ describe("opencode-leak-proof", () => {
       await expect(before({}, { args: { filePath: "src/.env" } })).resolves.toBeUndefined();
       await expect(before({}, { args: { filePath: "config/.env" } })).resolves.toBeUndefined();
     });
+
+    test("pattern with leading slash stripped", async () => {
+      createConfigFile(".aiexclude", "/.env\n/secrets/");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const before = plugin["tool.execute.before"];
+
+      await expect(before({}, { args: { filePath: ".env" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "secrets/key.txt" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "src/.env" } })).resolves.toBeUndefined();
+    });
+
+    test("multiple leading slashes handled", async () => {
+      createConfigFile(".aiexclude", "/build/");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const before = plugin["tool.execute.before"];
+
+      await expect(before({}, { args: { filePath: "build/output.js" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "src/build/file.js" } })).resolves.toBeUndefined();
+    });
+
+    test("pattern matches with full project root path", async () => {
+      createConfigFile(".aiexclude", "**/*.env");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const before = plugin["tool.execute.before"];
+
+      const fullPath = path.join(testProjectRoot, ".env").replace(/\\/g, "/");
+      await expect(before({}, { args: { filePath: fullPath } })).rejects.toThrow();
+
+      await expect(before({}, { args: { filePath: ".env" } })).rejects.toThrow();
+    });
   });
 
   describe("negation patterns", () => {
