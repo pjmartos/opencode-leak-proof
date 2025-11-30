@@ -116,6 +116,18 @@ describe("opencode-leak-proof", () => {
       await expect(before({}, { args: { filePath: "config/.env" } })).resolves.toBeUndefined();
     });
 
+    test("directory pattern ending with slash", async () => {
+      createConfigFile(".aiexclude", "secrets/");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const before = plugin["tool.execute.before"];
+
+      await expect(before({}, { args: { filePath: "secrets/api-key.txt" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "secrets/sub/password.txt" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "public/file.txt" } })).resolves.toBeUndefined();
+      await expect(before({}, { args: { filePath: "data.txt" } })).resolves.toBeUndefined();
+    });
+
     test("pattern with leading slash stripped", async () => {
       createConfigFile(".aiexclude", "/.env\n/secrets/");
       const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
@@ -255,6 +267,13 @@ describe("opencode-leak-proof", () => {
       await expect(before({}, { args: { filePath: ".env" } })).rejects.toThrow();
       await expect(before({}, { args: { filePath: "test.log" } })).rejects.toThrow();
     });
+
+    test("only negation character and whitespace", async () => {
+      createConfigFile(".aiexclude", " ! ");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      expect(plugin).toEqual({});
+    });
   });
 
   describe("path normalization", () => {
@@ -277,6 +296,29 @@ describe("opencode-leak-proof", () => {
       await expect(before({}, { args: { filePath: "logs\\2024\\01\\app.log" } })).rejects.toThrow();
       await expect(before({}, { args: { filePath: "logs/2024/01/app.log" } })).rejects.toThrow();
       await expect(before({}, { args: { filePath: "logs\\2024/01\\app.log" } })).rejects.toThrow();
+    });
+  });
+
+  describe("command parameter filtering", () => {
+    test("check command parameter", async () => {
+      createConfigFile(".aiexclude", "**/*.env");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const before = plugin["tool.execute.before"];
+
+      await expect(before({}, { args: { command: "cat .env" } })).rejects.toThrow();
+      await expect(before({}, { args: { command: "test.env" } })).rejects.toThrow();
+      await expect(before({}, { args: { command: "npm install" } })).resolves.toBeUndefined();
+    });
+
+    test("filePath takes precedence when both present", async () => {
+      createConfigFile(".aiexclude", "**/*.env");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const before = plugin["tool.execute.before"];
+
+      await expect(before({}, { args: { filePath: "test.env", command: "safe-command" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "safe.txt", command: "test.env" } })).resolves.toBeUndefined();
     });
   });
 
@@ -479,6 +521,50 @@ important.log`);
 
       await expect(before({}, { args: { filePath: "test-utils.js" } })).rejects.toThrow();
       await expect(before({}, { args: { filePath: "file_data.txt" } })).rejects.toThrow();
+    });
+
+    test("brace expansion patterns", async () => {
+      createConfigFile(".aiexclude", "*.{key,pem,crt}");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const before = plugin["tool.execute.before"];
+
+      await expect(before({}, { args: { filePath: "private.key" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "cert.pem" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "ssl.crt" } })).rejects.toThrow();
+      await expect(before({}, { args: { filePath: "file.txt" } })).resolves.toBeUndefined();
+    });
+  });
+
+  describe("error messages", () => {
+    test("error messages include original patterns", async () => {
+      createConfigFile(".aiexclude", "**/*.env\n**/*.key");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const before = plugin["tool.execute.before"];
+
+      try {
+        await before({}, { args: { filePath: "test.env" } });
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error.message).toContain("**/*.env");
+        expect(error.message).toContain("**/*.key");
+        expect(error.message).toContain("test.env");
+      }
+    });
+
+    test("output error messages include patterns", async () => {
+      createConfigFile(".aiexclude", "**/*.secret");
+      const plugin = await LeakProof({ project: { worktree: testProjectRoot } });
+
+      const after = plugin["tool.execute.after"];
+
+      try {
+        await after({}, { output: "file.secret" });
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error.message).toContain("**/*.secret");
+      }
     });
   });
 });
