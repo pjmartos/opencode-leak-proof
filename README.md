@@ -1,5 +1,4 @@
-# OpenCode Leak Proof Plugin
-
+# OpenCode Leak Proof Plugin ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/pjmartos/opencode-leak-proof)
 An OpenCode plugin that prevents AI assistants from accessing sensitive files and content based on configurable exclusion patterns using the well-known glob style.
 
 ## Overview
@@ -28,7 +27,7 @@ curl -fsSL https://bun.com/install | bash
 ```
 2. Install plugin
 ```bash
-bash -c "mkdir -p $HOME/.config/opencode && cd $_ && bun add github:pjmartos/opencode-leak-proof"
+bash -c "mkdir -p $HOME/.config/opencode && cd $_ && bun add github:pjmartos/opencode-leak-proof#v0.1.0"
 ```
 
 #### Windows
@@ -38,7 +37,7 @@ powershell -Command "irm bun.sh/install.ps1|iex ; $env:PATH = [Environment]::Get
 ```
 2. Install plugin
 ```shell
-powershell -Command "cd -Path $HOME ; md -Force .config\opencode ; cd .config\opencode ; bun add github:pjmartos/opencode-leak-proof"
+powershell -Command "cd -Path $HOME ; md -Force .config\opencode ; cd .config\opencode ; bun add github:pjmartos/opencode-leak-proof#v0.1.0"
 ```
 
 ## Usage

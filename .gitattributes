@@ -1,0 +1,6 @@
+*.test.js export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+bun.lock export-ignore
+bunfig.toml export-ignore
+CONTRIBUTING.md export-ignore
